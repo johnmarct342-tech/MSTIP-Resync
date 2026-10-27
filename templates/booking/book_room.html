@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}Book a Room - MSTIP RoomSync{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm mt-4">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Book a Room</h4>
+            </div>
+            <div class="card-body">
+                
+                <!-- THIS IS THE MISSING BANNER CODE -->
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <strong>Wait!</strong> {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                <!-- END BANNER -->
+
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <!-- This renders the form fields nicely -->
+                    {{ form.as_p }}
+
+                    <button type="submit" class="btn btn-success w-100 mt-3">Submit Request</button>
+                </form>
+
+                <div class="mt-3 text-center">
+                    <a href="{% url 'room_list' %}">Back to Room List</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add this HTML for the live warning banner -->
+<div id="live-warning" class="alert alert-warning d-none mt-3">
+    <strong>Heads up!</strong> This room has a scheduled class (<span id="conflict-subject"></span>) during this time. You will not be able to book it.
+</div>
+
+<!-- Include the JSON data safely -->
+{{ schedules_json|json_script:"schedules-data" }}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Get the schedule data from Django
+        const schedules = JSON.parse(document.getElementById('schedules-data').textContent);
+        
+        // Get the form inputs
+        const roomInput = document.getElementById('id_room');
+        const dateInput = document.getElementById('id_date');
+        const startInput = document.getElementById('id_start_time');
+        const endInput = document.getElementById('id_end_time');
+        
+        // The warning box
+        const warningBox = document.getElementById('live-warning');
+        const subjectSpan = document.getElementById('conflict-subject');
+
+        function checkLiveConflict() {
+            const roomId = parseInt(roomInput.value);
+            const dateValue = dateInput.value;
+            const start = startInput.value;
+            const end = endInput.value;
+
+            // Hide warning by default
+            warningBox.classList.add('d-none');
+
+            // If any field is empty, do nothing
+            if (!roomId || !dateValue || !start || !end) return;
+
+            // Get the day of the week from the selected date (e.g., 'MON', 'TUE')
+            const dateObj = new Date(dateValue);
+            const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+            const selectedDay = days[dateObj.getUTCDay()];
+
+            // Loop through all schedules to see if there is a match
+            for (let i = 0; i < schedules.length; i++) {
+                let sched = schedules[i];
+                
+                // Check if room and day match
+                if (sched.room_id === roomId && sched.day === selectedDay) {
+                    
+                    // Check if time overlaps
+                    if ((start < sched.end) && (end > sched.start)) {
+                        
+                        // Show the warning!
+                        warningBox.classList.remove('d-none');
+                        subjectSpan.textContent = sched.subject;
+                        
+                        // Optional: Turn the inputs red
+                        startInput.classList.add('is-invalid');
+                        endInput.classList.add('is-invalid');
+                        return; // Stop checking
+                    }
+                }
+            }
+            
+            // If no conflict found, remove red borders
+            startInput.classList.remove('is-invalid');
+            endInput.classList.remove('is-invalid');
+        }
+
+        // Run the check every time the user changes a value
+        roomInput.addEventListener('change', checkLiveConflict);
+        dateInput.addEventListener('change', checkLiveConflict);
+        startInput.addEventListener('change', checkLiveConflict);
+        endInput.addEventListener('change', checkLiveConflict);
+    });
+</script>
+{% endblock %}

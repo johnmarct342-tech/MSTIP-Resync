@@ -1,0 +1,100 @@
+/* Import a modern font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Apply the font to the whole body */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f4f7f6; /* Soft, modern off-white background */
+    color: #333;
+}
+
+/* Modernize the Navbar */
+.navbar {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Subtle shadow under the navbar */
+    background: linear-gradient(90deg, #0d6efd, #0a58ca) !important; /* Slight gradient */
+    padding: 15px 0;
+     align-items: center;
+}
+
+.navbar .btn-danger {
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    box-shadow: none; 
+}
+
+.navbar-brand {
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+/* Modernize the Cards (Room List, Approvals, Forms) */
+.card {
+    border: none; /* Remove default ugly borders */
+    border-radius: 16px; /* Modern rounded corners */
+    box-shadow: 0 8px 24px rgba(149, 157, 165, 0.15); /* Soft, modern shadow */
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+/* Make cards "lift up" slightly when you hover over them */
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 28px rgba(149, 157, 165, 0.25);
+}
+
+/* Modernize the Form Inputs */
+.form-control, .form-select {
+    border-radius: 10px;
+    border: 1px solid #e0e0e0;
+    padding: 12px 15px;
+    background-color: #fafafa;
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: #fff;
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15); /* Soft glow when clicked */
+}
+
+/* Modernize Buttons */
+.btn {
+    border-radius: 10px; /* Rounded buttons */
+    font-weight: 500;
+    padding: 10px 20px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: #0d6efd;
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3); /* Blue glow */
+}
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+    transform: translateY(-2px); /* Slight jump on hover */
+}
+
+.btn-success {
+    box-shadow: 0 4px 12px rgba(25, 135, 84, 0.3);
+}
+
+.btn-danger {
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+/* Modernize the Tables (My Bookings) */
+.table {
+    border-radius: 12px;
+    overflow: hidden; /* Keeps the rounded corners */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    background-color: white;
+}
+
+.table thead th {
+    background-color: #f8f9fa;
+    color: #555;
+    font-weight: 600;
+    border-bottom: 2px solid #e9ecef;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}

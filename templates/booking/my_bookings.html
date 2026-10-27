@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}My Bookings{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">My Booking History</h2>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-striped shadow-sm align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>Ref No.</th>
+                <th>Room</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Status</th>
+                <th>Action</th> <!-- ADDED THIS -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for booking in bookings %}
+            <tr>
+                <td>{{ booking.reference_no }}</td>
+                <td>{{ booking.room.room_name }}</td>
+                <td>{{ booking.date }}</td>
+                <td>{{ booking.start_time }} - {{ booking.end_time }}</td>
+                <td>
+                    {% if booking.status == 'APPROVED' %}
+                        <span class="badge bg-success">Approved</span>
+                    {% elif booking.status == 'PENDING' %}
+                        <span class="badge bg-warning text-dark">Pending</span>
+                    {% elif booking.status == 'REJECTED' %}
+                        <span class="badge bg-danger">Rejected</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Cancelled</span>
+                    {% endif %}
+                </td>
+                <!-- ADDED THIS TD FOR THE CANCEL BUTTON -->
+                <td>
+                    {% if booking.status == 'PENDING' or booking.status == 'APPROVED' %}
+                        <a href="{% url 'cancel_booking' booking.id %}" 
+                           class="btn btn-sm btn-outline-danger" 
+                           onclick="return confirm('Are you sure you want to cancel this booking?');">
+                           Cancel
+                        </a>
+                    {% else %}
+                        <span class="text-muted">-</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <!-- UPDATED COLSPAN TO 6 -->
+                <td colspan="6" class="text-center">You haven't made any bookings yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

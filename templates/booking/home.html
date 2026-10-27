@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - MSTIP RoomSync{% endblock %}
+
+{% block content %}
+<div class="p-5 mb-4 bg-white rounded-3 shadow-sm text-center">
+    <h1 class="display-5 fw-bold text-primary">Welcome to MSTIP RoomSync</h1>
+    <p class="lead">Your central hub for booking rooms at Makati Science Technological Institute of the Philippines.</p>
+    <hr class="my-4">
+    <a href="{% url 'room_list' %}" class="btn btn-primary btn-lg">View Available Rooms</a>
+</div>
+{% endblock %}

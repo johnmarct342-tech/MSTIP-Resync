@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}Available Rooms{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Available Rooms</h2>
+
+<div class="row">
+    {% for room in rooms %}
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h4 class="card-title text-primary">{{ room.room_name }}</h4>
+                    <h6 class="card-subtitle mb-2 text-muted">{{ room.get_room_type_display }}</h6>
+                    <p class="card-text">
+                        <strong>Capacity:</strong> {{ room.capacity }} people<br>
+                        <strong>Status:</strong> 
+                        {% if room.is_available %}
+                            <span class="badge bg-success">Available</span>
+                        {% else %}
+                            <span class="badge bg-danger">Maintenance</span>
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="card-footer bg-white border-0">
+                    <a href="{% url 'book_room' %}" class="btn btn-outline-primary w-100">Book this Room</a>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="alert alert-warning">No rooms have been added to the system yet.</div>
+    {% endfor %}
+</div>
+{% endblock %}
