@@ -3,9 +3,20 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Room, Booking, ClassSchedule
 from .forms import BookingForm
 from django.contrib import messages
+from django.db.models import Count 
+import json
 
+@login_required
 def home(request):
-    return render(request, 'booking/home.html')
+    # Get the count of rooms and approved bookings
+    total_rooms = Room.objects.count()
+    total_bookings = Booking.objects.filter(status='APPROVED').count()
+    
+    context = {
+        'total_rooms': total_rooms,
+        'total_bookings': total_bookings
+    }
+    return render(request, 'booking/home.html', context)
 
 def room_list(request):
     # Fetch all rooms from the database
@@ -55,7 +66,7 @@ def book_room(request):
                 for sched in class_schedules:
                     if (start_time < sched.end_time) and (end_time > sched.start_time):
                         has_conflict = True
-                        conflict_reason = f"a regular class ({sched.subject_name})"
+                        conflict_reason = f"a regular class ({sched.subject_name}) from {sched.start_time.strftime('%I:%M %p')} to {sched.end_time.strftime('%I:%M %p')}"
                         break
 
             # --- 3. HANDLE THE CONFLICT ---
@@ -73,14 +84,12 @@ def book_room(request):
             print("--- FORM IS INVALID ---")
             print(form.errors)
 
+
     else:
         form = BookingForm()
 
-    # --- NEW CODE TO PASS SCHEDULES TO HTML ---
     # Fetch ALL class schedules to send to the JavaScript
     all_schedules = ClassSchedule.objects.all()
-    
-    # Create a Python dictionary to send to JavaScript
     schedules_data = []
     for sched in all_schedules:
         schedules_data.append({
@@ -93,7 +102,7 @@ def book_room(request):
 
     context = {
         'form': form,
-        'schedules_json': schedules_data # Pass this to the template
+        'schedules_json': schedules_data
     }
     return render(request, 'booking/book_room.html', context)
 
@@ -133,3 +142,30 @@ def cancel_booking(request, booking_id):
         messages.error(request, "You do not have permission to cancel this.")
         
     return redirect('my_bookings')
+
+@user_passes_test(lambda u: u.is_staff)
+@login_required
+def admin_dashboard(request):
+    # 1. Calculate Room Popularity (How many bookings per room)
+    room_stats = Room.objects.annotate(booking_count=Count('booking')).order_by('-booking_count')
+    room_labels = [room.room_name for room in room_stats]
+    room_data = [room.booking_count for room in room_stats]
+
+    # 2. Calculate Busiest Days (Group bookings by the day of the week)
+    # We use raw SQLite date formatting to extract the day (0=Sunday, 6=Saturday)
+    day_stats = Booking.objects.filter(status='APPROVED').extra(
+        select={'day': "strftime('%%w', date)"}
+    ).values('day').annotate(total=Count('id')).order_by('day')
+    
+    days_mapping = {0: 'Sunday', 1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday', 5: 'Friday', 6: 'Saturday'}
+    day_labels = [days_mapping[int(item['day'])] for item in day_stats]
+    day_data = [item['total'] for item in day_stats]
+
+    # Convert to JSON for Chart.js
+    context = {
+        'room_labels': json.dumps(room_labels),
+        'room_data': json.dumps(room_data),
+        'day_labels': json.dumps(day_labels),
+        'day_data': json.dumps(day_data),
+    }
+    return render(request, 'booking/admin_dashboard.html', context)

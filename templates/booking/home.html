@@ -3,10 +3,77 @@
 {% block title %}Home - MSTIP RoomSync{% endblock %}
 
 {% block content %}
-<div class="p-5 mb-4 bg-white rounded-3 shadow-sm text-center">
+<div class="p-5 mb-4 bg-white rounded-3 shadow-sm text-center" style="margin-top: 2rem;">
     <h1 class="display-5 fw-bold text-primary">Welcome to MSTIP RoomSync</h1>
-    <p class="lead">Your central hub for booking rooms at Makati Science Technological Institute of the Philippines.</p>
+    <p class="lead text-muted">Your central hub for booking rooms at Makati Science Technological Institute of the Philippines.</p>
+    <div class="my-4">
+        <h4 class="fw-bold text-dark" id="live-clock">Loading time...</h4>
+        <p class="text-muted small" id="live-date"></p>
+    </div>
     <hr class="my-4">
-    <a href="{% url 'room_list' %}" class="btn btn-primary btn-lg">View Available Rooms</a>
+    <a href="{% url 'room_list' %}" class="btn btn-primary btn-lg px-4">View Available Rooms</a>
+
+    <!-- DEBUGGING STATS -->
+    <div class="d-flex justify-content-center gap-5 mt-5">
+        <div class="text-center">
+            <h2 class="fw-bold text-primary mb-0">{{ total_rooms|default:"0" }}</h2>
+            <p class="text-muted text-uppercase small fw-bold mb-0">Total Rooms</p>
+        </div>
+        <div class="text-center">
+            <h2 class="fw-bold text-success mb-0">{{ total_bookings|default:"0" }}</h2>
+            <p class="text-muted text-uppercase small fw-bold mb-0">Approved Bookings</p>
+        </div>
+    </div>
 </div>
+
+<!-- FEATURE CARDS -->
+<div class="row mt-4 text-start">
+    <div class="col-md-4 mb-3">
+        <div class="card h-100 p-4">
+            <h4 class="text-primary mb-3">⚡ Real-Time Availability</h4>
+            <p class="text-muted mb-0">Instantly see which rooms are free, so you never have to walk around campus looking for an empty room again.</p>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card h-100 p-4">
+            <h4 class="text-primary mb-3">🛡️ No Double Bookings</h4>
+            <p class="text-muted mb-0">Our smart conflict checker automatically prevents you from booking a room that is already reserved or has a scheduled class.</p>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card h-100 p-4">
+            <h4 class="text-primary mb-3">✅ Easy Approval</h4>
+            <p class="text-muted mb-0">Submit your request online and get a unique reference number once approved by the MSTIP administration.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    function updateClock() {
+        const now = new Date();
+        
+        // Format Time (e.g., 10:30:45 AM)
+        const timeString = now.toLocaleTimeString('en-US', { 
+            hour12: true, 
+            hour: '2-digit', 
+            minute: '2-digit', 
+            //second: '2-digit' 
+        });
+        
+        // Format Date (e.g., Monday, October 28, 2026)
+        const dateString = now.toLocaleDateString('en-US', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+
+        document.getElementById('live-clock').textContent = timeString;
+        document.getElementById('live-date').textContent = dateString;
+    }
+
+    // Update immediately, then every 1 second
+    updateClock();
+    setInterval(updateClock, 1000);
+</script>
 {% endblock %}

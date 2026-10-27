@@ -137,3 +137,12 @@ MAILERS = {
 
 # Redirect to home page after successful login
 LOGIN_REDIRECT_URL = 'home'
+
+# Force users to log in again when they close the browser
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+# Set session to expire immediately (or after a very short time like 5 minutes)
+# SESSION_COOKIE_AGE = 300 
+
+# Tell Django where your custom login page is
+LOGIN_URL = 'login'

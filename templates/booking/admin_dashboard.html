@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}Analytics Dashboard - MSTIP RoomSync{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 mt-3">
+    <h2 class="fw-bold text-primary">📊 System Analytics</h2>
+    <a href="{% url 'approve_bookings' %}" class="btn btn-outline-secondary btn-sm">Back to Approvals</a>
+</div>
+
+<div class="row">
+    <!-- Pie Chart: Most Booked Rooms -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white fw-bold py-3">
+                Most Booked Rooms
+            </div>
+            <div class="card-body d-flex justify-content-center align-items-center">
+                <div style="width: 100%; max-width: 400px;">
+                    <canvas id="roomChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bar Chart: Busiest Days -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white fw-bold py-3">
+                Busiest Days of the Week (Approved Bookings)
+            </div>
+            <div class="card-body">
+                <canvas id="dayChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Load Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // 1. Get the data from Django
+    const roomLabels = {{ room_labels|safe }};
+    const roomData = {{ room_data|safe }};
+    const dayLabels = {{ day_labels|safe }};
+    const dayData = {{ day_data|safe }};
+
+    // 2. Setup Room Pie Chart
+    const ctxRoom = document.getElementById('roomChart').getContext('2d');
+    new Chart(ctxRoom, {
+        type: 'doughnut', // Doughnut looks more modern than Pie
+        data: {
+            labels: roomLabels,
+            datasets: [{
+                data: roomData,
+                backgroundColor: [
+                    '#0d6efd', '#198754', '#ffc107', '#dc3545', '#6f42c1', '#0dcaf0'
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+
+    // 3. Setup Busiest Days Bar Chart
+    const ctxDay = document.getElementById('dayChart').getContext('2d');
+    new Chart(ctxDay, {
+        type: 'bar',
+        data: {
+            labels: dayLabels,
+            datasets: [{
+                label: 'Number of Bookings',
+                data: dayData,
+                backgroundColor: '#0d6efd',
+                borderRadius: 8 // Modern rounded bars
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 } // Only show whole numbers (1, 2, 3)
+                }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+</script>
+{% endblock %}

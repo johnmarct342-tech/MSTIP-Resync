@@ -11,8 +11,7 @@
             </div>
             <div class="card-body">
                 
-                <!-- THIS IS THE MISSING BANNER CODE -->
-                {% if messages %}
+                {% if conflict_error %}
                     {% for message in messages %}
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
                             <strong>Wait!</strong> {{ message }}
@@ -20,7 +19,6 @@
                         </div>
                     {% endfor %}
                 {% endif %}
-                <!-- END BANNER -->
 
                 <form method="POST">
                     {% csrf_token %}
